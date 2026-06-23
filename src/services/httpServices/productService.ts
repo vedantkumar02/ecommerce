@@ -1,14 +1,27 @@
-import type { Category, Product, ProductListResponse } from "@/types/product";
-import { API_ROUTES, type ProductListParams } from "@/services/httpServices/apiRoutes";
+import type {
+  Category,
+  Product,
+  ProductListParams,
+  ProductListResponse,
+  ProductSearchParams,
+} from "@/services/httpServices/types";
+import { API_ROUTES } from "@/services/httpServices/apiRoutes";
 import httpClient from "@/services/httpServices/httpClient";
 
-async function request<T>(url: string, params?: ProductListParams) {
+async function request<T>(
+  url: string,
+  params?: ProductListParams | ProductSearchParams,
+) {
   const { data } = await httpClient.get(url, params ? { params } : undefined);
   return data as T;
 }
 
 export function getProducts(params?: ProductListParams) {
   return request<ProductListResponse>(API_ROUTES.products.list, params);
+}
+
+export function searchProducts(params: ProductSearchParams) {
+  return request<ProductListResponse>(API_ROUTES.products.search, params);
 }
 
 export function getCategories() {
