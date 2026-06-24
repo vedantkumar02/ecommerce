@@ -10,4 +10,5 @@ export type ProductGridProps = {
 
 export type StarRatingProps = {
   rating: number;
+  size?: "sm" | "md";
 };

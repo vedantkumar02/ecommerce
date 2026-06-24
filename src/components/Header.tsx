@@ -165,7 +165,7 @@ export default function Header() {
   const isListingPage = Boolean(useMatch({ path: "/", end: true }));
 
   return (
-    <header className="bg-slate-800 text-white">
+    <header className="sticky top-0 z-50 bg-slate-800 text-white">
       <div className="flex items-center justify-between px-4 py-3">
         {isListingPage ? (
           <ListingFilterToggle />
