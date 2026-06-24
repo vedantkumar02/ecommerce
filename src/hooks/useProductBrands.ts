@@ -10,7 +10,7 @@ export default function useProductBrands({
 }: UseProductBrandsOptions = {}): UseProductBrandsResult {
   const categoryCount = categories.length;
 
-  const { products, loading, error } = useProducts({
+  const { products, loading, error, refetch } = useProducts({
     limit: 0,
     skip: 0,
     fetchAll: true,
@@ -29,5 +29,5 @@ export default function useProductBrands({
     ].sort() as string[];
   }, [products, categoryCount, categories]);
 
-  return { brands, loading, error };
+  return { brands, loading, error, refetch };
 }

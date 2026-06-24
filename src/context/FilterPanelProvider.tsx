@@ -1,7 +1,8 @@
-import { useCallback, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { FilterPanelContext } from "@/context/filterPanelContext";
+import type { ProviderProps } from "@/context/types";
 
-export function FilterPanelProvider({ children }: { children: ReactNode }) {
+export function FilterPanelProvider({ children }: ProviderProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isDesktopExpanded, setIsDesktopExpanded] = useState(true);
 

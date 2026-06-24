@@ -5,5 +5,6 @@ export { default as useProduct } from "@/hooks/useProduct";
 export { default as useProductBrands } from "@/hooks/useProductBrands";
 export { default as useProductFilters } from "@/hooks/useProductFilters";
 export { default as useProducts } from "@/hooks/useProducts";
+export { default as useProductListing, PAGE_SIZE } from "@/hooks/useProductListing";
 export { default as useFilterPanel } from "@/hooks/useFilterPanel";
 export { SORT_OPTIONS } from "@/constants/filters";

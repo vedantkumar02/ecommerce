@@ -16,37 +16,22 @@ export type UseProductsResult = {
   total: number;
   loading: boolean;
   error: string | null;
-};
-
-export type ProductsState = {
-  queryKey: string;
-  products: Product[];
-  total: number;
-  error: string | null;
+  refetch: () => void;
 };
 
 export type UseProductResult = {
   product: Product | null;
   loading: boolean;
   error: string | null;
-};
-
-export type ProductState = {
-  id: string;
-  product: Product | null;
-  error: string | null;
+  notFound: boolean;
+  refetch: () => void;
 };
 
 export type UseCategoriesResult = {
   categories: Category[];
   loading: boolean;
   error: string | null;
-};
-
-export type CategoriesState = {
-  loaded: boolean;
-  categories: Category[];
-  error: string | null;
+  refetch: () => void;
 };
 
 export type UseProductBrandsOptions = {
@@ -57,6 +42,7 @@ export type UseProductBrandsResult = {
   brands: string[];
   loading: boolean;
   error: string | null;
+  refetch: () => void;
 };
 
 export type SortOption = {

@@ -1,13 +1,16 @@
+import type { ReactNode } from "react";
 import { Outlet } from "react-router-dom";
-import Header from "@/components/Header";
+import Header from "@/components/layout/Header";
 
-export default function Layout() {
+type LayoutProps = {
+  children?: ReactNode;
+};
+
+export default function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
       <Header />
-      <main>
-        <Outlet />
-      </main>
+      <main>{children ?? <Outlet />}</main>
     </div>
   );
 }

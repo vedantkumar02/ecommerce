@@ -13,6 +13,9 @@ export type BrandFilterProps = {
   brands: readonly string[];
   selectedBrands: string[];
   onBrandChange: CheckboxFilterHandler;
+  loading?: boolean;
+  error?: string | null;
+  onRetry?: () => void;
 };
 
 export type PriceRangeFilterProps = {
@@ -36,4 +39,9 @@ export type FilterCheckboxListProps = {
   selectedIds: string[];
   onChange: (id: string, checked: boolean) => void;
   initialVisibleCount?: number;
+};
+
+export type FilterCheckboxListSkeletonProps = {
+  count?: number;
+  showMore?: boolean;
 };

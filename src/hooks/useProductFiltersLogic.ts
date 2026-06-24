@@ -71,19 +71,6 @@ const DEFAULT_FILTERS: ProductFiltersState = {
   order: "asc",
 };
 
-function statesEqual(a: ProductFiltersState, b: ProductFiltersState): boolean {
-  return (
-    a.searchQuery === b.searchQuery &&
-    a.minPrice === b.minPrice &&
-    a.maxPrice === b.maxPrice &&
-    a.currentPage === b.currentPage &&
-    a.sortBy === b.sortBy &&
-    a.order === b.order &&
-    a.selectedCategories.join(",") === b.selectedCategories.join(",") &&
-    a.selectedBrands.join(",") === b.selectedBrands.join(",")
-  );
-}
-
 export default function useProductFiltersLogic(): ProductFiltersValue {
   const [searchParams, setSearchParams] = useSearchParams();
   const initial = readFiltersFromParams(searchParams);
@@ -153,11 +140,6 @@ export default function useProductFiltersLogic(): ProductFiltersValue {
     }
 
     const next = readFiltersFromParams(searchParams);
-    const current = getState();
-
-    if (statesEqual(next, current)) {
-      return;
-    }
 
     setSearchQueryState(next.searchQuery);
     setSelectedCategories(next.selectedCategories);
@@ -167,7 +149,7 @@ export default function useProductFiltersLogic(): ProductFiltersValue {
     setCurrentPageState(next.currentPage);
     setSortBy(next.sortBy);
     setOrder(next.order);
-  }, [searchParams, getState]);
+  }, [searchParams]);
 
   useEffect(() => {
     if (isInitialMount.current) {

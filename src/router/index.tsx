@@ -1,4 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
+import RedirectToHome from "@/components/layout/RedirectToHome";
+import RouteErrorFallback from "@/components/layout/RouteErrorFallback";
 import Sidebar from "@/components/layout/Sidebar";
 import Layout from "@/components/layout/Layout";
 import { FilterPanelProvider } from "@/context/FilterPanelProvider";
@@ -9,6 +11,11 @@ import ProductDetailPage from "@/pages/ProductDetailPage";
 export const router = createBrowserRouter([
   {
     path: "/",
+    errorElement: (
+      <Layout>
+        <RouteErrorFallback />
+      </Layout>
+    ),
     children: [
       {
         element: (
@@ -30,5 +37,9 @@ export const router = createBrowserRouter([
         children: [{ path: "product/:id", element: <ProductDetailPage /> }],
       },
     ],
+  },
+  {
+    path: "*",
+    element: <RedirectToHome />,
   },
 ]);

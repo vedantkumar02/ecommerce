@@ -1,46 +1,22 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { getCategories } from "@/services/httpServices";
-import type { CategoriesState, UseCategoriesResult } from "@/hooks/types";
+import { queryKeys } from "@/lib/queryKeys";
+import { API_MAINTENANCE_MESSAGE } from "@/utils/httpError";
+import type { UseCategoriesResult } from "@/hooks/types";
 
 export default function useCategories(): UseCategoriesResult {
-  const [state, setState] = useState<CategoriesState>({
-    loaded: false,
-    categories: [],
-    error: null,
+  const { data, isPending, error, refetch } = useQuery({
+    queryKey: queryKeys.categories.all,
+    queryFn: () => getCategories(),
+    staleTime: 5 * 60_000,
   });
 
-  useEffect(() => {
-    let cancelled = false;
-
-    getCategories()
-      .then((data) => {
-        if (!cancelled) {
-          setState({
-            loaded: true,
-            categories: data,
-            error: null,
-          });
-        }
-      })
-      .catch((err: unknown) => {
-        if (!cancelled) {
-          setState({
-            loaded: true,
-            categories: [],
-            error:
-              err instanceof Error ? err.message : "Failed to fetch categories",
-          });
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
   return {
-    categories: state.categories,
-    loading: !state.loaded,
-    error: state.error,
+    categories: data ?? [],
+    loading: isPending,
+    error: error ? API_MAINTENANCE_MESSAGE : null,
+    refetch: () => {
+      void refetch();
+    },
   };
 }
