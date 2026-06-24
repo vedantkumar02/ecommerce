@@ -163,12 +163,17 @@ function HeaderActions() {
 
 export default function Header() {
   const isListingPage = Boolean(useMatch({ path: "/", end: true }));
+  const isProductDetailPage = Boolean(useMatch({ path: "/product/:id" }));
 
   return (
     <header className="sticky top-0 z-50 bg-slate-800 text-white">
       <div className="flex items-center justify-between px-4 py-3">
         {isListingPage ? (
           <ListingFilterToggle />
+        ) : isProductDetailPage ? (
+          <div className="pointer-events-none invisible" aria-hidden>
+            <HeaderActions />
+          </div>
         ) : (
           <button
             type="button"
