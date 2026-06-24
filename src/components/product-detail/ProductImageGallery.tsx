@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import type { ProductImageGalleryProps } from "@/components/product-detail/types";
 
 const imageClassName =
@@ -10,35 +10,33 @@ export default function ProductImageGallery({
   onLoad,
   onError,
 }: ProductImageGalleryProps) {
-  const imgRef = useRef<HTMLImageElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
+  const isVisible = loadedSrc === src;
 
-  useEffect(() => {
-    setIsVisible(false);
-    const img = imgRef.current;
-    if (img?.complete && img.naturalWidth > 0) {
-      setIsVisible(true);
-      onLoad?.();
-    }
-  }, [src, onLoad]);
-
-  const handleLoad = () => {
-    setIsVisible(true);
+  const markLoaded = () => {
+    setLoadedSrc(src);
     onLoad?.();
   };
 
+  const handleRef = (img: HTMLImageElement | null) => {
+    if (img?.complete && img.naturalWidth > 0) {
+      markLoaded();
+    }
+  };
+
   const handleError = () => {
-    setIsVisible(true);
+    setLoadedSrc(src);
     onError?.();
   };
 
   return (
     <div className="flex w-full items-center justify-center">
       <img
-        ref={imgRef}
+        key={src}
+        ref={handleRef}
         src={src}
         alt={alt}
-        onLoad={handleLoad}
+        onLoad={markLoaded}
         onError={handleError}
         className={`${imageClassName} ${isVisible ? "opacity-100" : "opacity-0"}`}
       />

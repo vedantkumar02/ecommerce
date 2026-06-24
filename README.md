@@ -1,6 +1,6 @@
 # E-Commerce Product Listing
 
-A product browsing app built for the Leegality frontend engineering assessment. It fetches data from [DummyJSON](https://dummyjson.com/docs/products) and provides a listing page with filters and pagination, plus a product detail page.
+A product browsing app that fetches data from [DummyJSON](https://dummyjson.com/docs/products) and provides a listing page with filters and pagination, plus a product detail page.
 
 Live demo: https://ecommerce-vedant.vercel.app/
 
