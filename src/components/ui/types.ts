@@ -1,4 +1,8 @@
-import type { ButtonHTMLAttributes, InputHTMLAttributes } from "react";
+import type {
+  ButtonHTMLAttributes,
+  InputHTMLAttributes,
+  ReactNode,
+} from "react";
 
 export type ButtonVariant = "primary" | "outline";
 export type ButtonSize = "sm" | "md";
@@ -14,4 +18,10 @@ export type InputProps = InputHTMLAttributes<HTMLInputElement> & {
 
 export type CheckboxProps = Omit<InputHTMLAttributes<HTMLInputElement>, "type"> & {
   label: string;
+};
+
+export type EmptyStateProps = {
+  title: string;
+  description?: string;
+  children?: ReactNode;
 };

@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import Pagination from "@/components/pagination/Pagination";
 import ProductGrid from "@/components/product/ProductGrid";
+import EmptyState from "@/components/ui/EmptyState";
 import { SORT_OPTIONS, useProductFilters, useProducts } from "@/hooks";
 
 const PAGE_SIZE = 28;
@@ -89,6 +90,10 @@ export default function Home() {
     return filteredProducts.slice(start, start + PAGE_SIZE);
   }, [filteredProducts, needsClientFiltering, currentPage]);
 
+  const isEmpty = needsClientFiltering
+    ? filteredProducts.length === 0
+    : total === 0;
+
   const totalPages = needsClientFiltering
     ? Math.max(1, Math.ceil(filteredProducts.length / PAGE_SIZE))
     : Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -133,7 +138,14 @@ export default function Home() {
         <p className="py-12 text-center text-red-600">{error}</p>
       )}
 
-      {!loading && !error && (
+      {!loading && !error && isEmpty && (
+        <EmptyState
+          title="No products found"
+          description="Try adjusting your search or filters."
+        />
+      )}
+
+      {!loading && !error && !isEmpty && (
         <>
           <ProductGrid products={displayProducts} />
 
