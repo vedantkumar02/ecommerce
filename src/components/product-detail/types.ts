@@ -16,12 +16,8 @@ export type ProductImageSectionProps = {
 export type ProductImageGalleryProps = {
   src: string;
   alt: string;
-};
-
-export type ImageGalleryPaginationProps = {
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
+  onLoad?: () => void;
+  onError?: () => void;
 };
 
 export type ProductDetailsSectionProps = {

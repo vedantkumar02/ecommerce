@@ -8,6 +8,10 @@ export type ProductGridProps = {
   products: Product[];
 };
 
+export type ProductGridSkeletonProps = {
+  count?: number;
+};
+
 export type StarRatingProps = {
   rating: number;
   size?: "sm" | "md";
