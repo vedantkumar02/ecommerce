@@ -1,21 +1,11 @@
 import { useMemo } from "react";
-import FilterSidebar from "@/components/filters/FilterSidebar";
 import Pagination from "@/components/pagination/Pagination";
 import ProductGrid from "@/components/product/ProductGrid";
-import {
-  SORT_OPTIONS,
-  useCategories,
-  useFilterPanel,
-  useProductBrands,
-  useProductFilters,
-  useProducts,
-} from "@/hooks";
+import { SORT_OPTIONS, useProductFilters, useProducts } from "@/hooks";
 
 const PAGE_SIZE = 28;
 
-export default function ProductListingPage() {
-  const { isMobileOpen, isDesktopExpanded, closeMobile } = useFilterPanel();
-
+export default function Home() {
   const {
     listingSearch,
     selectedCategories,
@@ -28,17 +18,6 @@ export default function ProductListingPage() {
     setCurrentPage,
     setSort,
   } = useProductFilters();
-
-  const {
-    categories,
-    loading: categoriesLoading,
-    error: categoriesError,
-  } = useCategories();
-  const {
-    brands,
-    loading: brandsLoading,
-    error: brandsError,
-  } = useProductBrands();
 
   const needsClientFiltering =
     selectedBrands.length > 0 ||
@@ -128,72 +107,43 @@ export default function ProductListingPage() {
     }
   };
 
-  const isLoading = loading || categoriesLoading || brandsLoading;
-  const fetchError = error ?? categoriesError ?? brandsError;
-
   return (
-    <div className="flex">
-      <FilterSidebar
-        categories={categories}
-        brands={brands}
-        collapsed={!isDesktopExpanded}
-        className="hidden lg:block"
-      />
+    <div className="px-4 py-6 lg:px-6">
+      <div className="mb-4 flex items-center justify-end">
+        <label className="flex items-center gap-2 text-sm text-gray-600">
+          Sort by
+          <select
+            value={currentSortValue}
+            onChange={handleSortChange}
+            className="rounded border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900">
+            {SORT_OPTIONS.map((option) => (
+              <option key={option.label} value={option.label}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
 
-      {isMobileOpen && (
+      {loading && (
+        <p className="py-12 text-center text-gray-500">Loading products...</p>
+      )}
+
+      {error && !loading && (
+        <p className="py-12 text-center text-red-600">{error}</p>
+      )}
+
+      {!loading && !error && (
         <>
-          <div
-            className="fixed inset-0 z-40 bg-black/40 lg:hidden"
-            onClick={closeMobile}
-            aria-hidden="true"
-          />
-          <FilterSidebar
-            categories={categories}
-            brands={brands}
-            className="fixed inset-y-0 left-0 z-50 h-full overflow-y-auto lg:hidden"
-            showCloseButton
-            onClose={closeMobile}
+          <ProductGrid products={displayProducts} />
+
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
           />
         </>
       )}
-
-      <div className="flex-1 px-4 py-6 lg:px-6">
-        <div className="mb-4 flex items-center justify-end">
-          <label className="flex items-center gap-2 text-sm text-gray-600">
-            Sort by
-            <select
-              value={currentSortValue}
-              onChange={handleSortChange}
-              className="rounded border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-900">
-              {SORT_OPTIONS.map((option) => (
-                <option key={option.label} value={option.label}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-
-        {isLoading && (
-          <p className="py-12 text-center text-gray-500">Loading products...</p>
-        )}
-
-        {fetchError && !isLoading && (
-          <p className="py-12 text-center text-red-600">{fetchError}</p>
-        )}
-
-        {!isLoading && !fetchError && (
-          <>
-            <ProductGrid products={displayProducts} />
-
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-          </>
-        )}
-      </div>
     </div>
   );
 }

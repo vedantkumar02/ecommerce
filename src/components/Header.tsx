@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useMatch, useNavigate } from "react-router-dom";
 import { useFilterPanel, useProductFilters } from "@/hooks";
 
 function useIsDesktop() {
@@ -162,8 +162,7 @@ function HeaderActions() {
 }
 
 export default function Header() {
-  const location = useLocation();
-  const isListingPage = location.pathname === "/";
+  const isListingPage = Boolean(useMatch({ path: "/", end: true }));
 
   return (
     <header className="bg-slate-800 text-white">

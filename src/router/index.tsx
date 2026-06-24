@@ -1,24 +1,32 @@
 import { createBrowserRouter } from "react-router-dom";
-import Layout from "@/components/Layout";
-import ListingLayout from "@/components/ListingLayout";
-import DetailLayout from "@/components/DetailLayout";
-import ProductListingPage from "@/pages/ProductListingPage";
+import Sidebar from "@/components/layout/Sidebar";
+import Layout from "@/components/layout/Layout";
+import { FilterPanelProvider } from "@/context/FilterPanelProvider";
+import { ProductFiltersProvider } from "@/context/ProductFiltersProvider";
+import Home from "@/pages/Home";
 import ProductDetailPage from "@/pages/ProductDetailPage";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />,
     children: [
       {
-        element: <ListingLayout />,
+        element: (
+          <FilterPanelProvider>
+            <ProductFiltersProvider>
+              <Layout />
+            </ProductFiltersProvider>
+          </FilterPanelProvider>
+        ),
         children: [
-          { index: true, element: <ProductListingPage /> },
-          { path: "*", element: <ProductListingPage /> },
+          {
+            element: <Sidebar />,
+            children: [{ index: true, element: <Home /> }],
+          },
         ],
       },
       {
-        element: <DetailLayout />,
+        element: <Layout />,
         children: [{ path: "product/:id", element: <ProductDetailPage /> }],
       },
     ],
