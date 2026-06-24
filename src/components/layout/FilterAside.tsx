@@ -30,6 +30,12 @@ export default function FilterAside({
   brandsError = null,
   onBrandsRetry,
 }: FilterAsideProps) {
+  const showBrandFilter =
+    selectedCategories.length === 0 ||
+    brandsLoading ||
+    Boolean(brandsError) ||
+    brands.length > 0;
+
   const widthClasses = collapsed
     ? "w-0 border-r-0 p-0 opacity-0"
     : showCloseButton
@@ -88,14 +94,16 @@ export default function FilterAside({
             onApply={applyPriceRange}
           />
 
-          <BrandFilter
-            brands={brands}
-            selectedBrands={selectedBrands}
-            onBrandChange={toggleBrand}
-            loading={brandsLoading}
-            error={brandsError}
-            onRetry={onBrandsRetry}
-          />
+          {showBrandFilter && (
+            <BrandFilter
+              brands={brands}
+              selectedBrands={selectedBrands}
+              onBrandChange={toggleBrand}
+              loading={brandsLoading}
+              error={brandsError}
+              onRetry={onBrandsRetry}
+            />
+          )}
         </>
       )}
     </aside>

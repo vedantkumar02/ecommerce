@@ -13,13 +13,12 @@ export default function useProducts(
   const { data, isFetching, error, refetch, isPending } = useQuery({
     queryKey: queryKeys.products.list(options),
     queryFn: ({ signal }) => fetchProductList(options, signal),
-    placeholderData: (previousData) => previousData,
   });
 
   return {
     products: data?.products ?? [],
     total: data?.total ?? 0,
-    loading: isPending || (isFetching && !data),
+    loading: isPending || isFetching,
     error: error ? API_MAINTENANCE_MESSAGE : null,
     refetch: () => {
       void refetch();

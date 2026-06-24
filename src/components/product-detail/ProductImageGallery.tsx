@@ -1,5 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ProductImageGalleryProps } from "@/components/product-detail/types";
+
+const imageClassName =
+  "mx-auto max-h-96 w-auto max-w-full object-contain transition-opacity duration-300 ease-in-out sm:max-h-[28rem] lg:max-h-[min(36rem,70dvh)]";
 
 export default function ProductImageGallery({
   src,
@@ -8,13 +11,26 @@ export default function ProductImageGallery({
   onError,
 }: ProductImageGalleryProps) {
   const imgRef = useRef<HTMLImageElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    setIsVisible(false);
     const img = imgRef.current;
-    if (img?.complete) {
+    if (img?.complete && img.naturalWidth > 0) {
+      setIsVisible(true);
       onLoad?.();
     }
   }, [src, onLoad]);
+
+  const handleLoad = () => {
+    setIsVisible(true);
+    onLoad?.();
+  };
+
+  const handleError = () => {
+    setIsVisible(true);
+    onError?.();
+  };
 
   return (
     <div className="flex w-full items-center justify-center">
@@ -22,9 +38,9 @@ export default function ProductImageGallery({
         ref={imgRef}
         src={src}
         alt={alt}
-        onLoad={onLoad}
-        onError={onError}
-        className="mx-auto max-h-96 w-auto max-w-full object-contain sm:max-h-[28rem] lg:max-h-[min(36rem,70dvh)]"
+        onLoad={handleLoad}
+        onError={handleError}
+        className={`${imageClassName} ${isVisible ? "opacity-100" : "opacity-0"}`}
       />
     </div>
   );

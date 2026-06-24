@@ -9,14 +9,13 @@ export default function ProductImageSection({
   const images =
     product.images.length > 0 ? product.images : [product.thumbnail];
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [loadedImageUrl, setLoadedImageUrl] = useState<string | null>(null);
+  const [isGalleryReady, setIsGalleryReady] = useState(false);
 
   const currentImage = images[activeImageIndex] ?? product.thumbnail;
-  const isImageLoaded = loadedImageUrl === currentImage;
 
   const handleImageReady = useCallback(() => {
-    setLoadedImageUrl(currentImage);
-  }, [currentImage]);
+    setIsGalleryReady(true);
+  }, []);
 
   return (
     <div className="flex flex-col items-center">
@@ -27,8 +26,8 @@ export default function ProductImageSection({
         onError={handleImageReady}
       />
 
-      {isImageLoaded && (
-        <div className="mt-4">
+      {isGalleryReady && (
+        <div className="mt-4 transition-opacity duration-300 ease-in-out">
           <PaginationControls
             variant="gallery"
             hideWhenSinglePage

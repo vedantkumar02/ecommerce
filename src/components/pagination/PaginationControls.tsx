@@ -3,10 +3,10 @@ import { getPaginationRange } from "@/components/pagination/getPaginationRange";
 import type { PaginationControlsProps } from "@/components/pagination/types";
 
 const listingCellBase =
-  "inline-flex size-9 items-center justify-center rounded-md text-sm font-medium transition-colors";
+  "inline-flex size-9 items-center justify-center rounded-md text-sm font-medium transition-all duration-200 ease-in-out";
 
 const galleryCellBase =
-  "inline-flex items-center justify-center rounded-md border text-xs font-medium transition-colors sm:text-sm";
+  "inline-flex items-center justify-center rounded-md border text-xs font-medium transition-all duration-200 ease-in-out sm:text-sm";
 
 function listingNavClass(disabled: boolean) {
   return `${listingCellBase} ${
@@ -110,21 +110,25 @@ function GalleryPagination({
       </button>
 
       {Array.from({ length: totalPages }, (_, index) => index + 1).map(
-        (page) => (
-          <button
-            key={page}
-            type="button"
-            aria-label={`Go to image ${page}`}
-            aria-current={page === currentPage ? "page" : undefined}
-            onClick={() => onPageChange(page)}
-            className={`${galleryNavClass(false)} ${
-              page === currentPage
-                ? "border-blue-600 bg-blue-600 text-white"
-                : ""
-            }`}>
-            {page}
-          </button>
-        ),
+        (page) => {
+          const isActive = page === currentPage;
+
+          return (
+            <button
+              key={page}
+              type="button"
+              aria-label={`Go to image ${page}`}
+              aria-current={isActive ? "page" : undefined}
+              onClick={() => onPageChange(page)}
+              className={`${galleryCellBase} size-8 sm:size-9 ${
+                isActive
+                  ? "border-blue-600 bg-blue-600 text-white"
+                  : "border-gray-200 bg-white text-gray-900 hover:bg-gray-50"
+              }`}>
+              {page}
+            </button>
+          );
+        },
       )}
 
       <button
