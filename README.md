@@ -2,7 +2,7 @@
 
 A product browsing app built for the Leegality frontend engineering assessment. It fetches data from [DummyJSON](https://dummyjson.com/docs/products) and provides a listing page with filters and pagination, plus a product detail page.
 
-**Live demo:** _To be added after Vercel deployment._
+\*\*Live demo: https://ecommerce-vedant.vercel.app/
 
 ## Features
 
@@ -37,10 +37,9 @@ A product browsing app built for the Leegality frontend engineering assessment. 
 ### Install and run
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/vedantkumar02/ecommerce.git
 cd ecommerce
 npm install
-cp .env.example .env
 npm run dev
 ```
 
