@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { FILTER_DEBOUNCE_MS } from "@/constants/filters";
+import useDebounce from "@/hooks/useDebounce";
 import type {
   ProductFiltersState,
   ProductFiltersValue,
@@ -58,6 +60,17 @@ function buildSearchParams(state: ProductFiltersState): URLSearchParams {
   return params;
 }
 
+const DEFAULT_FILTERS: ProductFiltersState = {
+  searchQuery: "",
+  selectedCategories: [],
+  minPrice: "",
+  maxPrice: "",
+  selectedBrands: [],
+  currentPage: 1,
+  sortBy: "",
+  order: "asc",
+};
+
 function statesEqual(a: ProductFiltersState, b: ProductFiltersState): boolean {
   return (
     a.searchQuery === b.searchQuery &&
@@ -71,14 +84,24 @@ function statesEqual(a: ProductFiltersState, b: ProductFiltersState): boolean {
   );
 }
 
-export default function useProductFiltersState(): ProductFiltersValue {
+export default function useProductFiltersLogic(): ProductFiltersValue {
   const [searchParams, setSearchParams] = useSearchParams();
   const initial = readFiltersFromParams(searchParams);
+  const urlResetKey = searchParams.toString();
 
   const [searchQuery, setSearchQueryState] = useState(initial.searchQuery);
-  const [listingSearch, setListingSearch] = useState(initial.searchQuery);
+  const debouncedSearchQuery = useDebounce(
+    searchQuery,
+    FILTER_DEBOUNCE_MS,
+    urlResetKey,
+  );
   const [selectedCategories, setSelectedCategories] = useState(
     initial.selectedCategories,
+  );
+  const debouncedSelectedCategories = useDebounce(
+    selectedCategories,
+    FILTER_DEBOUNCE_MS,
+    urlResetKey,
   );
   const [minPrice, setMinPriceState] = useState(initial.minPrice);
   const [maxPrice, setMaxPriceState] = useState(initial.maxPrice);
@@ -87,14 +110,15 @@ export default function useProductFiltersState(): ProductFiltersValue {
   const [sortBy, setSortBy] = useState(initial.sortBy);
   const [order, setOrder] = useState<SortOrder>(initial.order);
 
-  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isInitialMount = useRef(true);
   const isSyncingFromUrl = useRef(false);
+  const isUserSearchChange = useRef(false);
+  const isUserCategoryChange = useRef(false);
 
   const getState = useCallback(
     (): ProductFiltersState => ({
-      searchQuery: listingSearch,
-      selectedCategories,
+      searchQuery: debouncedSearchQuery,
+      selectedCategories: debouncedSelectedCategories,
       minPrice,
       maxPrice,
       selectedBrands,
@@ -103,8 +127,8 @@ export default function useProductFiltersState(): ProductFiltersValue {
       order,
     }),
     [
-      listingSearch,
-      selectedCategories,
+      debouncedSearchQuery,
+      debouncedSelectedCategories,
       minPrice,
       maxPrice,
       selectedBrands,
@@ -136,7 +160,6 @@ export default function useProductFiltersState(): ProductFiltersValue {
     }
 
     setSearchQueryState(next.searchQuery);
-    setListingSearch(next.searchQuery);
     setSelectedCategories(next.selectedCategories);
     setMinPriceState(next.minPrice);
     setMaxPriceState(next.maxPrice);
@@ -154,8 +177,8 @@ export default function useProductFiltersState(): ProductFiltersValue {
 
     syncToUrl(getState());
   }, [
-    listingSearch,
-    selectedCategories,
+    debouncedSearchQuery,
+    debouncedSelectedCategories,
     minPrice,
     maxPrice,
     selectedBrands,
@@ -166,26 +189,32 @@ export default function useProductFiltersState(): ProductFiltersValue {
     getState,
   ]);
 
-  const setSearchQuery = useCallback((value: string) => {
-    setSearchQueryState(value);
-
-    if (searchDebounceRef.current) {
-      clearTimeout(searchDebounceRef.current);
+  useEffect(() => {
+    if (!isUserSearchChange.current) {
+      return;
     }
 
-    searchDebounceRef.current = setTimeout(() => {
-      setListingSearch(value);
-      setCurrentPageState(1);
-    }, 300);
-  }, []);
-
-  const setMinPrice = useCallback((value: string) => {
-    setMinPriceState(value);
+    isUserSearchChange.current = false;
     setCurrentPageState(1);
+  }, [debouncedSearchQuery]);
+
+  useEffect(() => {
+    if (!isUserCategoryChange.current) {
+      return;
+    }
+
+    isUserCategoryChange.current = false;
+    setCurrentPageState(1);
+  }, [debouncedSelectedCategories]);
+
+  const setSearchQuery = useCallback((value: string) => {
+    isUserSearchChange.current = true;
+    setSearchQueryState(value);
   }, []);
 
-  const setMaxPrice = useCallback((value: string) => {
-    setMaxPriceState(value);
+  const applyPriceRange = useCallback((min: string, max: string) => {
+    setMinPriceState(min);
+    setMaxPriceState(max);
     setCurrentPageState(1);
   }, []);
 
@@ -199,22 +228,51 @@ export default function useProductFiltersState(): ProductFiltersValue {
     setCurrentPageState(1);
   }, []);
 
-  const handleCategoryChange = useCallback(
-    (slug: string, checked: boolean) => {
-      setSelectedCategories((prev) =>
-        checked ? [...prev, slug] : prev.filter((item) => item !== slug),
-      );
-      setCurrentPageState(1);
-    },
-    [],
-  );
+  const toggleCategory = useCallback((slug: string, checked: boolean) => {
+    isUserCategoryChange.current = true;
+    setSelectedCategories((prev) =>
+      checked ? [...prev, slug] : prev.filter((item) => item !== slug),
+    );
+  }, []);
 
-  const handleBrandChange = useCallback((brand: string, checked: boolean) => {
+  const toggleBrand = useCallback((brand: string, checked: boolean) => {
     setSelectedBrands((prev) =>
       checked ? [...prev, brand] : prev.filter((item) => item !== brand),
     );
     setCurrentPageState(1);
   }, []);
+
+  const pruneSelectedBrands = useCallback((validBrands: readonly string[]) => {
+    const validSet = new Set(validBrands);
+    setSelectedBrands((prev) => {
+      const next = prev.filter((brand) => validSet.has(brand));
+      if (next.length !== prev.length) {
+        setCurrentPageState(1);
+      }
+      return next.length === prev.length ? prev : next;
+    });
+  }, []);
+
+  const resetAllFilters = useCallback(() => {
+    setSearchQueryState(DEFAULT_FILTERS.searchQuery);
+    setSelectedCategories(DEFAULT_FILTERS.selectedCategories);
+    setMinPriceState(DEFAULT_FILTERS.minPrice);
+    setMaxPriceState(DEFAULT_FILTERS.maxPrice);
+    setSelectedBrands(DEFAULT_FILTERS.selectedBrands);
+    setCurrentPageState(DEFAULT_FILTERS.currentPage);
+    setSortBy(DEFAULT_FILTERS.sortBy);
+    setOrder(DEFAULT_FILTERS.order);
+    syncToUrl(DEFAULT_FILTERS);
+  }, [syncToUrl]);
+
+  const hasActiveFilters =
+    searchQuery !== "" ||
+    selectedCategories.length > 0 ||
+    minPrice !== "" ||
+    maxPrice !== "" ||
+    selectedBrands.length > 0 ||
+    sortBy !== "" ||
+    currentPage > 1;
 
   return {
     searchQuery,
@@ -225,13 +283,16 @@ export default function useProductFiltersState(): ProductFiltersValue {
     currentPage,
     sortBy,
     order,
-    listingSearch,
+    debouncedSearchQuery,
+    debouncedSelectedCategories,
     setSearchQuery,
-    setMinPrice,
-    setMaxPrice,
+    applyPriceRange,
     setCurrentPage,
     setSort,
-    handleCategoryChange,
-    handleBrandChange,
+    toggleCategory,
+    toggleBrand,
+    pruneSelectedBrands,
+    resetAllFilters,
+    hasActiveFilters,
   };
 }

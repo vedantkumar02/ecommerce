@@ -1,5 +1,7 @@
 import type { SortOption } from "@/hooks/types";
 
+export const FILTER_DEBOUNCE_MS = 600;
+
 export const SORT_OPTIONS: SortOption[] = [
   { sortBy: "", order: "asc", label: "Recommended" },
   { sortBy: "price", order: "asc", label: "Price: Low to High" },

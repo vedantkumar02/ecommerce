@@ -3,15 +3,6 @@ import type { Category } from "@/services/httpServices/types";
 
 export type CheckboxFilterHandler = (id: string, checked: boolean) => void;
 
-export type FilterSidebarProps = {
-  className?: string;
-  collapsed?: boolean;
-  categories: Category[];
-  brands: readonly string[];
-  onClose?: () => void;
-  showCloseButton?: boolean;
-};
-
 export type CategoryFilterProps = {
   categories: Category[];
   selectedCategories: string[];
@@ -27,8 +18,7 @@ export type BrandFilterProps = {
 export type PriceRangeFilterProps = {
   minPrice: string;
   maxPrice: string;
-  onMinPriceChange: (value: string) => void;
-  onMaxPriceChange: (value: string) => void;
+  onApply: (min: string, max: string) => void;
 };
 
 export type FilterGroupProps = {

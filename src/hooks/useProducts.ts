@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
 import {
   getProducts,
@@ -10,6 +11,17 @@ import type {
   UseProductsOptions,
   UseProductsResult,
 } from "@/hooks/types";
+
+function isAbortError(err: unknown): boolean {
+  return (
+    axios.isCancel(err) ||
+    (err instanceof Error && err.name === "CanceledError") ||
+    (typeof err === "object" &&
+      err !== null &&
+      "code" in err &&
+      err.code === "ERR_CANCELED")
+  );
+}
 
 export default function useProducts({
   limit = 0,
@@ -42,7 +54,7 @@ export default function useProducts({
   const loading = state.queryKey !== queryKey;
 
   useEffect(() => {
-    let cancelled = false;
+    const controller = new AbortController();
 
     const params: ProductListParams = fetchAll
       ? { limit: 0 }
@@ -58,19 +70,21 @@ export default function useProducts({
       params.select = select;
     }
 
+    const requestOptions = { signal: controller.signal };
+
     const fetchProducts = () => {
       if (searchQuery) {
-        return searchProducts({ q: searchQuery, ...params });
+        return searchProducts({ q: searchQuery, ...params }, requestOptions);
       }
       if (category) {
-        return getProductsByCategory(category, params);
+        return getProductsByCategory(category, params, requestOptions);
       }
-      return getProducts(params);
+      return getProducts(params, requestOptions);
     };
 
     fetchProducts()
       .then((data) => {
-        if (!cancelled) {
+        if (!controller.signal.aborted) {
           setState({
             queryKey,
             products: data.products,
@@ -80,19 +94,21 @@ export default function useProducts({
         }
       })
       .catch((err: unknown) => {
-        if (!cancelled) {
-          setState({
-            queryKey,
-            products: [],
-            total: 0,
-            error:
-              err instanceof Error ? err.message : "Failed to fetch products",
-          });
+        if (controller.signal.aborted || isAbortError(err)) {
+          return;
         }
+
+        setState({
+          queryKey,
+          products: [],
+          total: 0,
+          error:
+            err instanceof Error ? err.message : "Failed to fetch products",
+        });
       });
 
     return () => {
-      cancelled = true;
+      controller.abort();
     };
   }, [
     queryKey,

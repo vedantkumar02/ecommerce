@@ -8,20 +8,38 @@ import type {
 import { API_ROUTES } from "@/services/httpServices/apiRoutes";
 import httpClient from "@/services/httpServices/httpClient";
 
+type RequestOptions = {
+  signal?: AbortSignal;
+};
+
 async function request<T>(
   url: string,
   params?: ProductListParams | ProductSearchParams,
+  options?: RequestOptions,
 ) {
-  const { data } = await httpClient.get(url, params ? { params } : undefined);
+  const { data } = await httpClient.get(url, {
+    params,
+    signal: options?.signal,
+  });
   return data as T;
 }
 
-export function getProducts(params?: ProductListParams) {
-  return request<ProductListResponse>(API_ROUTES.products.list, params);
+export function getProducts(
+  params?: ProductListParams,
+  options?: RequestOptions,
+) {
+  return request<ProductListResponse>(API_ROUTES.products.list, params, options);
 }
 
-export function searchProducts(params: ProductSearchParams) {
-  return request<ProductListResponse>(API_ROUTES.products.search, params);
+export function searchProducts(
+  params: ProductSearchParams,
+  options?: RequestOptions,
+) {
+  return request<ProductListResponse>(
+    API_ROUTES.products.search,
+    params,
+    options,
+  );
 }
 
 export function getCategories() {
@@ -31,10 +49,12 @@ export function getCategories() {
 export function getProductsByCategory(
   category: string,
   params?: ProductListParams,
+  options?: RequestOptions,
 ) {
   return request<ProductListResponse>(
     API_ROUTES.products.byCategory(category),
     params,
+    options,
   );
 }
 

@@ -49,6 +49,10 @@ export type CategoriesState = {
   error: string | null;
 };
 
+export type UseProductBrandsOptions = {
+  categories?: string[];
+};
+
 export type UseProductBrandsResult = {
   brands: string[];
   loading: boolean;
@@ -74,13 +78,16 @@ export type ProductFiltersState = {
 
 export type ProductFiltersActions = {
   setSearchQuery: (value: string) => void;
-  setMinPrice: (value: string) => void;
-  setMaxPrice: (value: string) => void;
+  applyPriceRange: (min: string, max: string) => void;
   setCurrentPage: (page: number) => void;
   setSort: (sortBy: string, order: SortOrder) => void;
-  handleCategoryChange: (slug: string, checked: boolean) => void;
-  handleBrandChange: (brand: string, checked: boolean) => void;
-  listingSearch: string;
+  toggleCategory: (slug: string, checked: boolean) => void;
+  toggleBrand: (brand: string, checked: boolean) => void;
+  pruneSelectedBrands: (validBrands: readonly string[]) => void;
+  resetAllFilters: () => void;
+  hasActiveFilters: boolean;
+  debouncedSearchQuery: string;
+  debouncedSelectedCategories: string[];
 };
 
 export type ProductFiltersValue = ProductFiltersState & ProductFiltersActions;

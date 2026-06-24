@@ -1,9 +1,9 @@
 import { type ReactNode } from "react";
 import { ProductFiltersContext } from "@/context/productFiltersContext";
-import useProductFiltersState from "@/hooks/useProductFiltersState";
+import useProductFiltersLogic from "@/hooks/useProductFiltersLogic";
 
 export function ProductFiltersProvider({ children }: { children: ReactNode }) {
-  const value = useProductFiltersState();
+  const value = useProductFiltersLogic();
 
   return (
     <ProductFiltersContext.Provider value={value}>

@@ -7,8 +7,8 @@ const PAGE_SIZE = 28;
 
 export default function Home() {
   const {
-    listingSearch,
-    selectedCategories,
+    debouncedSearchQuery,
+    debouncedSelectedCategories,
     minPrice,
     maxPrice,
     selectedBrands,
@@ -23,19 +23,19 @@ export default function Home() {
     selectedBrands.length > 0 ||
     minPrice !== "" ||
     maxPrice !== "" ||
-    selectedCategories.length > 1 ||
-    (listingSearch !== "" && selectedCategories.length >= 1);
+    debouncedSelectedCategories.length > 1 ||
+    (debouncedSearchQuery !== "" && debouncedSelectedCategories.length >= 1);
 
   const apiCategory =
-    !listingSearch && selectedCategories.length === 1
-      ? selectedCategories[0]
+    !debouncedSearchQuery && debouncedSelectedCategories.length === 1
+      ? debouncedSelectedCategories[0]
       : undefined;
 
   const { products, total, loading, error } = useProducts({
     limit: PAGE_SIZE,
     skip: (currentPage - 1) * PAGE_SIZE,
     category: apiCategory,
-    searchQuery: listingSearch || undefined,
+    searchQuery: debouncedSearchQuery || undefined,
     sortBy: sortBy || undefined,
     order: sortBy ? order : undefined,
     fetchAll: needsClientFiltering,
@@ -48,8 +48,8 @@ export default function Home() {
 
     return products.filter((product) => {
       if (
-        selectedCategories.length > 0 &&
-        !selectedCategories.includes(product.category)
+        debouncedSelectedCategories.length > 0 &&
+        !debouncedSelectedCategories.includes(product.category)
       ) {
         return false;
       }
@@ -74,7 +74,7 @@ export default function Home() {
   }, [
     products,
     needsClientFiltering,
-    selectedCategories,
+    debouncedSelectedCategories,
     selectedBrands,
     minPrice,
     maxPrice,
